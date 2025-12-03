@@ -1,0 +1,38 @@
+from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
+    filters,
+    ContextTypes
+)
+
+# Токен вашего бота (получаете у BotFather)
+TOKEN = '8392269343:AAFu3s-3qitAJcnU6Byu7143kx2PvUu_GO8'
+
+# Кнопочная разметка
+REPLY_KEYBOARD_MARKUP = ReplyKeyboardMarkup([
+    [KeyboardButton('♾️Забронировать'), KeyboardButton('♾️Связаться с менеджером')]
+], resize_keyboard=True)
+
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик команды /start, показывающий основную клавиатуру."""
+    user = update.effective_user
+    await update.message.reply_html(
+        rf"Привет, {user.first_name},👋 Вы можете самостоятельно забронировать столик или связаться с нашим менеджером для уточнения деталей:",
+        reply_markup=REPLY_KEYBOARD_MARKUP
+    )
+
+async def button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик нажатия кнопок."""
+    if update.message.text == '♾️Забронировать':
+        await update.message.reply_text("Забронируйте стол на нашем сайте:\nhttps://450041.restoplace.ws")
+    elif update.message.text == '♾️Связаться с менеджером':
+        await update.message.reply_text("Свяжитесь с нашим менеджером для уточнения информации:\ntg://resolve?domain=wechno_molodoy77")
+
+if __name__ == "__main__":
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start_command))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, button_pressed))
+    print("Бот запущен!")
+    app.run_polling()
